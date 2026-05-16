@@ -23,7 +23,7 @@ export default function RequestsTable({
         <TableHeader>
           <TableRow>
             <TableHead>Requester Name</TableHead>
-            <TableHead>Item</TableHead>
+            <TableHead>Item Code</TableHead>
             <TableHead>Quantity</TableHead>
             <TableHead>Reason</TableHead>
             <TableHead className="text-right">Status</TableHead>

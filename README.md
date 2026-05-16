@@ -15,6 +15,12 @@ bunx drizzle-kit push
 bun dev
 ```
 
+### Required Environment Variables
+
+- DATABASE_URL - PostgreSQL Database URL
+- BETTER_AUTH_SECRET - Authentication Secret Key (Generate One)
+- BETTER_AUTH_URL - Host URL (http://localhost:3000)
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Tech Stack

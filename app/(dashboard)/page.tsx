@@ -5,6 +5,8 @@ import CreateNewInventoryRequest from "@/components/create-request";
 import ItemsTable from "@/components/table-items";
 import RequestsTable from "@/components/table-requests";
 
+export const revalidate = 0;
+
 export default async function Home() {
   const [items, requests] = await Promise.all([
     getAllItems(),
