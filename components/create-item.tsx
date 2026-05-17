@@ -12,10 +12,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { createItem } from "@/actions/items";
 import { toast } from "sonner";
 import { delay } from "@/lib/utils";
+import { AuthContext } from "./auth-provider";
 
 export default function CreateNewInventoryItem() {
   // uses useRef instead of useState for performance improvements
@@ -25,6 +26,9 @@ export default function CreateNewInventoryItem() {
   const categoryRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const session = useContext(AuthContext);
+  if (session?.user.role !== "Admin") return <></>;
 
   const createItemFn = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
