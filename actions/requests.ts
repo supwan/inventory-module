@@ -1,19 +1,41 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import db from "@/lib/db";
 import { items, requests } from "@/lib/db/schema";
 import { eq, sql } from "drizzle-orm";
-import { headers } from "next/headers";
+import { ERROR, isAdmin, SUCCESS } from "./helper";
 
-export const getRequestById = async (id: string) => {
-  const data = await db.select().from(requests).where(eq(requests.id, id));
-  return data[0];
+export const getRequestById = async (
+  id: string,
+): Promise<{ success: boolean; content?: any }> => {
+  const session = await getSession();
+  if (!session) return ERROR("Unauthorized!");
+
+  try {
+    const data = await db.select().from(requests).where(eq(requests.id, id));
+    return SUCCESS(data[0]);
+  } catch (err) {
+    console.log(err);
+    return ERROR("Failed to get request!");
+  }
 };
 
-export const getAllRequests = async () => {
-  const data = await db.select().from(requests);
-  return data;
+export const getAllRequests = async (): Promise<{
+  success: boolean;
+  content?: any;
+}> => {
+  const session = await getSession();
+  if (!session) return ERROR("Unauthorized!");
+
+  try {
+    const data = await db.select().from(requests);
+    return SUCCESS(data);
+  } catch (err) {
+    console.log(err);
+    return ERROR("Failed to get all requests!");
+  }
 };
 
 export const createRequest = async ({
@@ -26,12 +48,9 @@ export const createRequest = async ({
   itemCode: string;
   quantity: number;
   reason: string;
-}): Promise<{ success: boolean; message?: string }> => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) return { success: false, message: "Unauthorized" };
+}): Promise<{ success: boolean; content?: any }> => {
+  const session = await getSession();
+  if (!session) return ERROR("Unauthorized!");
 
   try {
     await db.insert(requests).values({
@@ -42,9 +61,10 @@ export const createRequest = async ({
       status: "Pending",
       userId: session.user.id,
     });
-    return { success: true };
-  } catch {
-    return { success: false };
+    return SUCCESS("Request created!");
+  } catch (err) {
+    console.log(err);
+    return ERROR("Failed to create request!");
   }
 };
 
@@ -54,7 +74,10 @@ export const updateRequestStatusById = async ({
 }: {
   id: string;
   status: "Pending" | "Rejected" | "Approved";
-}) => {
+}): Promise<{ success: boolean; content?: any }> => {
+  const session = await getSession();
+  if (!isAdmin(session)) return ERROR("Unauthorized!");
+
   try {
     await db
       .update(requests)
@@ -62,9 +85,10 @@ export const updateRequestStatusById = async ({
         status,
       })
       .where(eq(requests.id, id));
-    return { success: true };
-  } catch {
-    return { success: false };
+    return SUCCESS("Request's status updated!");
+  } catch (err) {
+    console.log(err);
+    return ERROR("Failed to update request's status!");
   }
 };
 
@@ -74,37 +98,48 @@ export const fulfillRequest = async ({
 }: {
   id: string;
   amount: number;
-}): Promise<{
-  success: boolean;
-  message?: string;
-}> => {
-  const [request] = await db.select().from(requests).where(eq(requests.id, id));
-  if (!request) return { success: false, message: "Request not found!" };
+}): Promise<{ success: boolean; content?: any }> => {
+  const session = await getSession();
+  if (!isAdmin(session)) return ERROR("Unauthorized!");
 
-  const [item] = await db
-    .select()
-    .from(items)
-    .where(eq(items.code, request.itemCode));
-  if (!request) return { success: false, message: "Item not found!" };
+  try {
+    const status = await db.transaction(async (tx) => {
+      const [request] = await tx
+        .select()
+        .from(requests)
+        .where(eq(requests.id, id));
+      if (!request) return ERROR("Request not found!");
 
-  if (request.status === "Fulfilled")
-    return { success: false, message: "Request already fulfilled!" };
+      const [item] = await tx
+        .select()
+        .from(items)
+        .where(eq(items.code, request.itemCode));
+      if (!item) return ERROR("Item not found!");
 
-  if (item.availableQuantity < amount)
-    return { success: false, message: "Not enough stock" };
+      if (request.status === "Fulfilled")
+        return ERROR("Request already fulfilled!");
 
-  await Promise.all([
-    db
-      .update(items)
-      .set({
-        availableQuantity: sql`${items.availableQuantity} - ${amount}`,
-      })
-      .where(eq(items.code, request.itemCode)),
-    db
-      .update(requests)
-      .set({ status: "Fulfilled" })
-      .where(eq(requests.id, request.id)),
-  ]);
+      if (item.availableQuantity < amount)
+        return ERROR("Item not enough stock!");
 
-  return { success: true };
+      await Promise.all([
+        tx
+          .update(items)
+          .set({
+            availableQuantity: sql`${items.availableQuantity} - ${amount}`,
+          })
+          .where(eq(items.code, request.itemCode)),
+        tx
+          .update(requests)
+          .set({ status: "Fulfilled" })
+          .where(eq(requests.id, request.id)),
+      ]);
+
+      return SUCCESS("Request fulfilled!");
+    });
+    return status;
+  } catch (err) {
+    console.log(err);
+    return ERROR("Failed to fulfill request!");
+  }
 };
