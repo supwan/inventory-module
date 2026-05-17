@@ -78,9 +78,7 @@ export default function CreateNewInventoryRequest({
 
   return (
     <Dialog>
-      <DialogTrigger render={<Button variant="secondary" />}>
-        New Request
-      </DialogTrigger>
+      <DialogTrigger render={<Button />}>New Request</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Inventory Request</DialogTitle>
