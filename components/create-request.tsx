@@ -59,19 +59,19 @@ export default function CreateNewInventoryRequest({
     }
     setIsLoading(true);
 
-    const { success } = await createRequest({
+    const req = await createRequest({
       requesterName,
       itemCode,
       quantity: parseInt(quantity),
       reason,
     });
 
-    if (!success) {
+    if (!req.success) {
       setIsLoading(false);
-      return toast.error("Something is wrong");
+      return toast.error(req.content);
     }
 
-    toast.success("Request Created! Reloading...");
+    toast.success(req.content);
     await delay(3000);
     location.reload();
   };

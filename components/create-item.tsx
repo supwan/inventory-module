@@ -50,19 +50,19 @@ export default function CreateNewInventoryItem() {
     }
     setIsLoading(true);
 
-    const { success } = await createItem({
+    const req = await createItem({
       code,
       name,
       availableQuantity: parseInt(availableQuantity),
       category,
     });
 
-    if (!success) {
+    if (!req.success) {
       setIsLoading(false);
-      return toast.error("Something is wrong");
+      return toast.error(req.content);
     }
 
-    toast.success("Item Created! Reloading...");
+    toast.success(req.content);
     await delay(3000);
     location.reload();
   };
