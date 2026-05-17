@@ -5,4 +5,5 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+export const delay = (ms: number = 2000) =>
+  new Promise((res) => setTimeout(res, ms));
