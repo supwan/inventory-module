@@ -10,12 +10,17 @@ import {
 } from "@/components/ui/table";
 import { requests } from "@/lib/db/schema";
 import { redirect } from "next/navigation";
+import { useContext } from "react";
+import { AuthContext } from "./auth-provider";
 
 export default function RequestsTable({
   data,
 }: {
   data: (typeof requests.$inferSelect)[];
 }) {
+  const session = useContext(AuthContext);
+  const isAdmin = session?.user.role === "Admin";
+
   return (
     <div className="grid gap-2">
       <h3 className="font-semibold">Requests</h3>
@@ -34,7 +39,7 @@ export default function RequestsTable({
             data.map((request) => (
               <TableRow
                 key={request.id}
-                onClick={() => redirect("/requests/" + request.id)}
+                onClick={() => isAdmin && redirect("/requests/" + request.id)}
               >
                 <TableCell className="font-medium">
                   {request.requesterName}

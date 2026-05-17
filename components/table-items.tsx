@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/table";
 import { items } from "@/lib/db/schema";
 import { redirect, RedirectType } from "next/navigation";
+import { useContext } from "react";
+import { AuthContext } from "./auth-provider";
 
 const LowStockPing = () => {
   return (
@@ -28,6 +30,9 @@ export default function ItemsTable({
 }: {
   data: (typeof items.$inferSelect)[];
 }) {
+  const session = useContext(AuthContext);
+  const isAdmin = session?.user.role === "Admin";
+
   return (
     <div className="grid gap-2">
       <h3 className="font-semibold">Items</h3>
@@ -46,7 +51,7 @@ export default function ItemsTable({
               <TableRow
                 key={data.code}
                 onClick={() =>
-                  redirect("/items/" + data.code, RedirectType.push)
+                  isAdmin && redirect("/items/" + data.code, RedirectType.push)
                 }
               >
                 <TableCell className="font-medium">{data.name}</TableCell>
