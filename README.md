@@ -1,5 +1,17 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Demo
+
+- **Production:** https://inventory-module.vercel.app
+- **Development:** http://localhost:3000
+
+### Accounts
+
+To access the admin account, use the following credentials:
+
+- Email: `admin@example.com`
+- Password: `password`
+
 ## Setup Process
 
 This project uses [Bun](https://bun.com/) as a package manager instead of NPM
@@ -33,14 +45,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Assumptions
 
-- No rate limiting required for this demo
 - Category are strings, no ENUMS are specified in the requirements
-- Designed for desktops instead of mobile
 
 ## AI Usage
 
-**This codebase is 95% handwritten entirely without the help of AI Tools.**
-
 - **AI Tool:** GitHub Copilot
-- **What you used them for:** Implementing basic testing
-- I reviewed and modified `/test` directory. Everything else is written by me without the help of AI Tools
+- **What I used them for:** Investigated a bug, reviewed requirements coverage and code quality, highlighting risks and improvements. Added basic testing using Vitest.
+- **What I wrote:** Everything except for `/tests/*`
+- **What I reviewed and modified:** `/tests/*` directory
+- Almost all implementations **except for /tests/** are written by me without the help AI assistants
