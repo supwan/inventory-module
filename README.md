@@ -12,6 +12,8 @@ To access the admin account, use the following credentials:
 - Email: `admin@example.com`
 - Password: `password`
 
+**THIS CREDENTIAL IS ONLY VALID FOR THE [PRODUCTION DEMO](https://inventory-module.vercel.app)**
+
 ## Setup Process
 
 This project uses [Bun](https://bun.com/) as a package manager instead of NPM
@@ -40,8 +42,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - **Frontend:** Next.js (App Router)
 - **Language:** TypeScript
 - **Backend:** PostgreSQL ([Supabase](https://supabase.com/))
-- **UI/Styling:** Shadcn UI Components
+- **Authentication:** [Better Auth](https://better-auth.com/)
 - **ORM:** Drizzle ORM
+- **UI/Styling:** Shadcn UI Components
+- **Deployment Platform:** Vercel
 
 ## Assumptions
 
@@ -53,4 +57,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - **What I used them for:** Investigated a bug, reviewed requirements coverage and code quality, highlighting risks and improvements. Added basic testing using Vitest.
 - **What I wrote:** Everything except for `/tests/*`
 - **What I reviewed and modified:** `/tests/*` directory
-- Almost all implementations **except for /tests/** are written by me without the help AI assistants
+- Almost all implementations **except for `/tests/*`** are written entirely by me
