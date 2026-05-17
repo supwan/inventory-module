@@ -17,11 +17,11 @@ export default async function Home() {
     <div className="grid gap-4">
       <div className="flex gap-1">
         <CreateNewInventoryItem />
-        <CreateNewInventoryRequest items={items} />
+        <CreateNewInventoryRequest items={items.content} />
       </div>
 
-      <ItemsTable data={items} />
-      <RequestsTable data={requests} />
+      <ItemsTable data={items.content} />
+      <RequestsTable data={requests.content} />
     </div>
   );
 }
