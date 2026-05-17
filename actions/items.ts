@@ -1,17 +1,59 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
+import { getSession } from "@/lib/auth";
 import db from "@/lib/db";
-import { items } from "@/lib/db/schema";
+import { items, requests } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { ERROR, isAdmin, SUCCESS } from "./helper";
 
-export const getAllItems = async () => {
-  const data = await db.select().from(items);
-  return data;
+export const getAllItems = async (): Promise<{
+  success: boolean;
+  content?: any;
+}> => {
+  const session = await getSession();
+  if (!session) return ERROR("Unauthorized!");
+
+  try {
+    const data = await db.select().from(items);
+    return SUCCESS(data);
+  } catch (err) {
+    console.log(err);
+    return ERROR("Failed to get all items!");
+  }
 };
 
-export const getItemByCode = async (code: string) => {
-  const data = await db.select().from(items).where(eq(items.code, code));
-  return data[0];
+export const getItemByCode = async (
+  code: string,
+): Promise<{ success: boolean; content?: any }> => {
+  const session = await getSession();
+  if (!session) return ERROR("Unauthorized!");
+
+  try {
+    const data = await db.select().from(items).where(eq(items.code, code));
+    return SUCCESS(data[0]);
+  } catch (err) {
+    console.log(err);
+    return ERROR("Failed to get item!");
+  }
+};
+
+export const getItemRequests = async (
+  code: string,
+): Promise<{ success: boolean; content?: any }> => {
+  const session = await getSession();
+  if (!session) return ERROR("Unauthorized!");
+
+  try {
+    const data = await db
+      .select()
+      .from(requests)
+      .where(eq(requests.itemCode, code));
+    return SUCCESS(data);
+  } catch (err) {
+    console.log(err);
+    return ERROR("Failed to get item's requests!");
+  }
 };
 
 export const createItem = async ({
@@ -24,7 +66,10 @@ export const createItem = async ({
   name: string;
   availableQuantity: number;
   category: string;
-}) => {
+}): Promise<{ success: boolean; content?: any }> => {
+  const session = await getSession();
+  if (!isAdmin(session)) return ERROR("Unauthorized!");
+
   try {
     await db.insert(items).values({
       code,
@@ -32,9 +77,10 @@ export const createItem = async ({
       availableQuantity,
       category,
     });
-    return { success: true };
-  } catch {
-    return { success: false };
+    return SUCCESS("Item created!");
+  } catch (err) {
+    console.log(err);
+    return ERROR("Failed to create item!");
   }
 };
 
@@ -50,7 +96,10 @@ export const updateItem = async ({
   name: string;
   availableQuantity: number;
   category: string;
-}) => {
+}): Promise<{ success: boolean; content?: any }> => {
+  const session = await getSession();
+  if (!isAdmin(session)) return ERROR("Unauthorized!");
+
   try {
     await db
       .update(items)
@@ -61,9 +110,9 @@ export const updateItem = async ({
         category,
       })
       .where(eq(items.code, code));
-    return { success: true };
+    return SUCCESS("Item updated!");
   } catch (err) {
     console.log(err);
-    return { success: false };
+    return ERROR("Failed to update item!");
   }
 };
