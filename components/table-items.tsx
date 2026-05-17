@@ -3,6 +3,7 @@
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -12,6 +13,7 @@ import { items } from "@/lib/db/schema";
 import { redirect, RedirectType } from "next/navigation";
 import { useContext } from "react";
 import { AuthContext } from "./auth-provider";
+import { cn } from "@/lib/utils";
 
 const LowStockPing = () => {
   return (
@@ -53,6 +55,7 @@ export default function ItemsTable({
                 onClick={() =>
                   isAdmin && redirect("/items/" + data.code, RedirectType.push)
                 }
+                className={cn(isAdmin && "cursor-pointer")}
               >
                 <TableCell className="font-medium">{data.name}</TableCell>
                 <TableCell>{data.code}</TableCell>
@@ -64,6 +67,8 @@ export default function ItemsTable({
               </TableRow>
             ))}
         </TableBody>
+
+        {isAdmin && <TableCaption>Click item to edit</TableCaption>}
       </Table>
     </div>
   );

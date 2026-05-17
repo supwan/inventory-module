@@ -3,6 +3,7 @@
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -12,6 +13,7 @@ import { requests } from "@/lib/db/schema";
 import { redirect } from "next/navigation";
 import { useContext } from "react";
 import { AuthContext } from "./auth-provider";
+import { cn } from "@/lib/utils";
 
 export default function RequestsTable({
   data,
@@ -40,6 +42,7 @@ export default function RequestsTable({
               <TableRow
                 key={request.id}
                 onClick={() => isAdmin && redirect("/requests/" + request.id)}
+                className={cn(isAdmin && "cursor-pointer")}
               >
                 <TableCell className="font-medium">
                   {request.requesterName}
@@ -52,6 +55,7 @@ export default function RequestsTable({
               </TableRow>
             ))}
         </TableBody>
+        {isAdmin && <TableCaption>Click request to edit</TableCaption>}
       </Table>
     </div>
   );
